@@ -1,0 +1,48 @@
+metricbeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+metricbeat.modules:
+- module: elasticsearch
+  xpack.enabled: true
+  period: 10s
+  hosts: ["https://es01:9200"]
+  ssl.certificate_authorities: "certs/ca/ca.crt"
+  ssl.certificate: "certs/es01/es01.crt"
+  ssl.key: "certs/es01/es01.key"
+  username: 'elastic'
+  password: 'changeme'
+  ssl.enabled: true
+
+- module: kibana
+  metricsets:
+    - stats
+  period: 10s
+  hosts: ["http://kibana:5601"]
+  username: 'elastic'
+  password: 'changeme'
+  xpack.enabled: true
+
+- module: docker
+  metricsets:
+    - "container"
+    - "cpu"
+    - "diskio"
+    - "healthcheck"
+    - "info"
+    #- "image"
+    - "memory"
+    - "network"
+  hosts: ["unix:///var/run/docker.sock"]
+  period: 10s
+  enabled: true
+
+output.elasticsearch:
+  hosts: 'https://es01:9200'
+  username: 'elastic'
+  password: 'changeme'
+  ssl:
+    certificate: "certs/es01/es01.crt"
+    certificate_authorities: "certs/ca/ca.crt"
+    key: "certs/es01/es01.key"
+

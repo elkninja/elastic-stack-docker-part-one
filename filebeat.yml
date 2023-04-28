@@ -1,0 +1,13 @@
+filebeat.inputs:
+- type: filestream
+  id: default-filestream
+  paths:
+    - ingest_data/*.log
+
+output.elasticsearch:
+  hosts: ["https://es01:9200"]
+  username: "elastic"
+  password: "changeme" 
+  ssl.enabled: true
+  ssl.certificate_authorities: "certs/ca/ca.crt"
+
