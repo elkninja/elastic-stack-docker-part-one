@@ -1,5 +1,24 @@
 version: "3.8"
 
+volumes:
+  certs:
+    driver: local
+  esdata01:
+    driver: local
+  kibanadata:
+    driver: local
+  metricbeatdata01:
+    driver: local
+  filebeatdata01:
+    driver: local
+  logstashdata01:
+    driver: local
+
+networks:
+  default:
+    name: elastic
+    external: false
+
 services:
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
@@ -61,6 +80,8 @@ services:
       setup:
         condition: service_healthy
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    labels:
+      co.elastic.logs/module: elasticsearch
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
       - esdata01:/usr/share/elasticsearch/data
@@ -103,6 +124,8 @@ services:
       es01:
         condition: service_healthy
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    labels:
+      co.elastic.logs/module: kibana
     volumes:
       - certs:/usr/share/kibana/config/certs
       - kibanadata:/usr/share/kibana/data
@@ -156,34 +179,25 @@ services:
       - filebeatdata01:/usr/share/filebeat/data
       - "./filebeat_ingest_data/:/usr/share/filebeat/ingest_data/"
       - "./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
-
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
   logstash01:
     depends_on:
       es01:
         condition: service_healthy
+      kibana:
+        condition: service_healthy
     image: docker.elastic.co/logstash/logstash:${STACK_VERSION}
+    labels:
+      co.elastic.logs/module: kibana
     user: root
     volumes:
       - certs:/usr/share/logstash/certs
       - logstashdata01:/usr/share/logstash/data
       - "./logstash_ingest_data/:/usr/share/logstash/ingest_data/"
       - "./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
-
-volumes:
-  certs:
-    driver: local
-  esdata01:
-    driver: local
-  kibanadata:
-    driver: local
-  metricbeatdata01:
-    driver: local
-  filebeatdata01:
-    driver: local
-  logstashdata01:
-    driver: local
-
-networks:
-  default:
-    name: elastic
-    external: false
+    environment:
+      - xpack.monitoring.enabled=false
+      - xpack.monitoring.elasticsearch.hosts="https://es01:9200"
+      - xpack.monitoring.elasticsearch.ssl.certificate_authority=certs/ca/ca.crt
+      - xpack.monitoring.elasticsearch.ssl.verification_mode=certificate

@@ -4,6 +4,20 @@ filebeat.inputs:
   paths:
     - ingest_data/*.log
 
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+
+processors:
+- add_docker_metadata: ~
+
+setup.kibana:
+  host: "http://kibana:5601"
+  username: "elastic"
+  password: "changeme" 
+
+
 output.elasticsearch:
   hosts: ["https://es01:9200"]
   username: "elastic"

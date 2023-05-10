@@ -14,8 +14,13 @@ metricbeat.modules:
   password: 'changeme'
   ssl.enabled: true
 
+- module: logstash
+  xpack.enabled: true
+  period: 10s
+  hosts: ["http://logstash01:9600"]
+
 - module: kibana
-  metricsets:
+  metricsets: 
     - stats
   period: 10s
   hosts: ["http://kibana:5601"]
@@ -36,6 +41,10 @@ metricbeat.modules:
   hosts: ["unix:///var/run/docker.sock"]
   period: 10s
   enabled: true
+
+processors:
+  - add_host_metadata: ~
+  - add_docker_metadata: ~
 
 output.elasticsearch:
   hosts: 'https://es01:9200'
