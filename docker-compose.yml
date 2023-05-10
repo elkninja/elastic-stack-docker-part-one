@@ -181,6 +181,7 @@ services:
       - "./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      
   logstash01:
     depends_on:
       es01:
@@ -188,8 +189,6 @@ services:
       kibana:
         condition: service_healthy
     image: docker.elastic.co/logstash/logstash:${STACK_VERSION}
-    labels:
-      co.elastic.logs/module: kibana
     user: root
     volumes:
       - certs:/usr/share/logstash/certs
@@ -198,6 +197,3 @@ services:
       - "./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
     environment:
       - xpack.monitoring.enabled=false
-      - xpack.monitoring.elasticsearch.hosts="https://es01:9200"
-      - xpack.monitoring.elasticsearch.ssl.certificate_authority=certs/ca/ca.crt
-      - xpack.monitoring.elasticsearch.ssl.verification_mode=certificate
