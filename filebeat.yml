@@ -13,15 +13,14 @@ processors:
 - add_docker_metadata: ~
 
 setup.kibana:
-  host: "http://kibana:5601"
-  username: "elastic"
-  password: "changeme" 
-
+  host: ${KIBANA_HOSTS}
+  username: ${ELASTIC_USER}
+  password: ${ELASTIC_PASSWORD} 
 
 output.elasticsearch:
-  hosts: ["https://es01:9200"]
-  username: "elastic"
-  password: "changeme" 
+  hosts: ${ELASTIC_HOSTS}
+  username: ${ELASTIC_USER}
+  password: ${ELASTIC_PASSWORD}
   ssl.enabled: true
   ssl.certificate_authorities: "certs/ca/ca.crt"
-
+  
