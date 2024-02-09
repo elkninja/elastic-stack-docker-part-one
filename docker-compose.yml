@@ -174,7 +174,7 @@ services:
       - KIBANA_HOSTS=http://kibana:5601
       - LOGSTASH_HOSTS=http://logstash01:9600
     command:
-      - strict.perms=false
+      - --strict.perms=false
 
   filebeat01:
     depends_on:
@@ -196,7 +196,7 @@ services:
       - KIBANA_HOSTS=http://kibana:5601
       - LOGSTASH_HOSTS=http://logstash01:9600
     command:
-      - strict.perms=false
+      - --strict.perms=false
 
   logstash01:
     depends_on:
@@ -218,5 +218,3 @@ services:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - ELASTIC_HOSTS=https://es01:9200
-    command:
-      - strict.perms=false
